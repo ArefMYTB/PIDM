@@ -43,7 +43,7 @@ def create_dataloader(opt, distributed, labels_required, is_inference):
     dataloader = torch.utils.data.DataLoader(
         instance,
         batch_size=batch_size,
-        sampler=data_sampler(instance, shuffle=not is_inference, distributed=distributed),
+        sampler=data_sampler(instance, shuffle=not is_inference, distributed=None),
         drop_last=not is_inference,
         num_workers=getattr(opt, 'num_workers', 0),
     )          
