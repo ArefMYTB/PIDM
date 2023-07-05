@@ -98,7 +98,7 @@ def train(conf, loader, val_loader, model, ema, diffusion, betas, optimizer, sch
     loss_mean_list = []
     loss_vb_list = []
  
-    for epoch in range(1000):
+    for epoch in range(2):
 
         if is_main_process: print ('#Epoch - '+str(epoch))
 
@@ -141,7 +141,7 @@ def train(conf, loader, val_loader, model, ema, diffusion, betas, optimizer, sch
             loss_vb_list.append(loss_vb.detach().item())
 
             accumulate(
-                ema, model.module, 0 if i < conf.training.scheduler.warmup else 0.9999
+                ema, model, 0 if i < conf.training.scheduler.warmup else 0.9999
             )
 
 
@@ -241,12 +241,12 @@ def main(settings, EXP_NAME):
     if DiffConf.ckpt is not None: 
         DiffConf.training.scheduler.warmup = 0
 
-    DiffConf.distributed = True
-    local_rank = int(os.environ['LOCAL_RANK'])
+    DiffConf.distributed = False
+    local_rank = 0
     
     DataConf.data.train.batch_size = args.batch_size//2  #src -> tgt , tgt -> src
     
-    val_dataset, train_dataset = deepfashion_data.get_train_val_dataloader(DataConf.data, labels_required = True, distributed = True)
+    val_dataset, train_dataset = deepfashion_data.get_train_val_dataloader(DataConf.data, labels_required = True, distributed = False)
     
     def cycle(iterable):
         while True:
@@ -293,7 +293,7 @@ def main(settings, EXP_NAME):
 
 if __name__ == "__main__":
 
-    init_distributed()
+    # init_distributed()
 
     import argparse
 
@@ -308,10 +308,10 @@ if __name__ == "__main__":
     parser.add_argument('--sample_algorithm', type=str, default='ddim') # ddpm, ddim
     parser.add_argument('--batch_size', type=int, default=2)
     parser.add_argument('--save_wandb_logs_every_iters', type=int, default=50)
-    parser.add_argument('--save_checkpoints_every_iters', type=int, default=2000)
-    parser.add_argument('--save_wandb_images_every_epochs', type=int, default=10)
+    parser.add_argument('--save_checkpoints_every_iters', type=int, default=50)
+    parser.add_argument('--save_wandb_images_every_epochs', type=int, default=1)
     parser.add_argument('--device', type=str, default='cuda')
-    parser.add_argument('--n_gpu', type=int, default=8)
+    parser.add_argument('--n_gpu', type=int, default=2)
     parser.add_argument('--n_machine', type=int, default=1)
     parser.add_argument('--local_rank', type=int, default=0)
     parser.add_argument("opts", default=None, nargs=argparse.REMAINDER)
