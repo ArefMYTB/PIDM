@@ -198,7 +198,7 @@ def train(conf, loader, val_loader, model, ema, diffusion, betas, optimizer, sch
                
             )
 
-        if (epoch)%args.save_wandb_images_every_epochs==0:
+        if (epoch)%args.save_wandb_images_every_epochs==5:
 
             print ('Generating samples at epoch number ' + str(epoch))
 
@@ -309,7 +309,7 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', type=int, default=2)
     parser.add_argument('--save_wandb_logs_every_iters', type=int, default=50)
     parser.add_argument('--save_checkpoints_every_iters', type=int, default=50)
-    parser.add_argument('--save_wandb_images_every_epochs', type=int, default=1)
+    parser.add_argument('--save_wandb_images_every_epochs', type=int, default=10)
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--n_gpu', type=int, default=2)
     parser.add_argument('--n_machine', type=int, default=1)
