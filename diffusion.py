@@ -14,6 +14,8 @@ from models.nn import mean_flat
 from models.losses import normal_kl, discretized_gaussian_log_likelihood
 from types import *
 
+import torch.nn.functional as F
+
 import torch
 import tqdm
 
@@ -1013,10 +1015,17 @@ class GaussianDiffusion:
             }[self.model_mean_type]
             assert model_output.shape == target.shape == x_start.shape
             terms["mse"] = mean_flat((target - model_output) ** 2)
+
+            # cosine distance
+            target = F.normalize(target, p=2, dim=1)
+            model_output = F.normalize(model_output, p=2, dim=1)
+            cosine = torch.sum(target * model_output, dim=1)
+            terms["cosine_distance"] = 1 - cosine.mean()
+
             if "vb" in terms:
-                terms["loss"] = terms["mse"] + terms["vb"]
+                terms["loss"] = terms["mse"] + terms["vb"] + terms["cosine_distance"]
             else:
-                terms["loss"] = terms["mse"]
+                terms["loss"] = terms["mse"] + terms["cosine_distance"]
         else:
             raise NotImplementedError(self.loss_type)
 
