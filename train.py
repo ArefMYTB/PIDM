@@ -99,7 +99,7 @@ def train(conf, loader, val_loader, model, ema, diffusion, betas, optimizer, sch
     loss_vb_list = []
     loss_cosine_list = []
  
-    for epoch in range(2):
+    for epoch in range(40):
 
         if is_main_process: print ('#Epoch - '+str(epoch))
 
@@ -161,7 +161,7 @@ def train(conf, loader, val_loader, model, ema, diffusion, betas, optimizer, sch
                 loss_cosine_list = []
 
 
-            if i%args.save_checkpoints_every_iters == 0 and is_main_process():
+            if i%args.save_checkpoints_every_iters == -1 and is_main_process():
 
                 if conf.distributed:
                     model_module = model.module
@@ -203,7 +203,7 @@ def train(conf, loader, val_loader, model, ema, diffusion, betas, optimizer, sch
                
             )
 
-        if (epoch)%args.save_wandb_images_every_epochs==5:
+        if (epoch)%args.save_wandb_images_every_epochs==-1:
 
             print ('Generating samples at epoch number ' + str(epoch))
 
