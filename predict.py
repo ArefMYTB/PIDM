@@ -50,9 +50,15 @@ class Predictor():
 
         src = Image.open(image)
         src = self.transforms(src).unsqueeze(0).cuda()
-        pose = glob.glob(pose_path)
+        # pose = glob.glob(pose_path)
         # tgt_pose = torch.stack([transforms.ToTensor()(np.load(ps)).cuda() for ps in np.random.choice(self.pose_list, num_poses)], 0)
-        tgt_pose = torch.stack(transforms.ToTensor()(np.load(pose)).cuda())
+        # tgt_pose = torch.stack(transforms.ToTensor()(np.load(pose_path)).cuda())
+        # Read pose data from the .txt file
+        with open(pose_path, 'r') as file:
+            pose_data = [line.strip().split() for line in file]
+
+        # Convert pose data to a tensor
+        tgt_pose = torch.tensor(pose_data, dtype=torch.float32).cuda()
         src = src.repeat(num_poses,1,1,1)
 
         if sample_algorithm == 'ddpm':
