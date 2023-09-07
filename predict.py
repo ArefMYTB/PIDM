@@ -40,6 +40,7 @@ class Predictor():
     def predict_pose(
         self,
         image,
+        pose_path,
         num_poses=1,
         sample_algorithm='ddim',
         nsteps=100,
@@ -49,8 +50,9 @@ class Predictor():
 
         src = Image.open(image)
         src = self.transforms(src).unsqueeze(0).cuda()
-        tgt_pose = torch.stack([transforms.ToTensor()(np.load(ps)).cuda() for ps in np.random.choice(self.pose_list, num_poses)], 0)
-
+        pose = glob.glob(pose_path)
+        # tgt_pose = torch.stack([transforms.ToTensor()(np.load(ps)).cuda() for ps in np.random.choice(self.pose_list, num_poses)], 0)
+        tgt_pose = torch.stack(transforms.ToTensor()(np.load(pose)).cuda())
         src = src.repeat(num_poses,1,1,1)
 
         if sample_algorithm == 'ddpm':
